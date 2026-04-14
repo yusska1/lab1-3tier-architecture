@@ -20,7 +20,7 @@ def login():
     return data
 
 
-# создание задачи
+# создаем задачи
 def create_task(token):
     title = input("Title: ")
     desc = input("Description: ")
@@ -47,14 +47,14 @@ def get_tasks(token):
 # основная логика программы
 data = login()
 
-# если логин не удался
+# если логин не удался то...
 if "token" not in data:
     print("Login failed!")
     exit()
 
 token = data["token"]
 
-# простое меню
+# меню
 while True:
     print("\n1. Create task")
     print("2. Get tasks")

@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 # подключение к базе данных
 def get_db():
-    # если файла database.db нет — он создастся автоматически
+    # - создание database.db автоматически, если нет его
     return sqlite3.connect("database.db")
 
 
@@ -17,9 +17,9 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-# ---------------------------
+
 # ИНИЦИАЛИЗАЦИЯ БАЗЫ
-# ---------------------------
+
 @app.route("/init")
 def init_db():
     db = get_db()
@@ -64,9 +64,9 @@ def init_db():
     return "DB initialized"
 
 
-# ---------------------------
+
 # ЛОГИН
-# ---------------------------
+
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json  # получаем JSON от клиента
@@ -88,9 +88,9 @@ def login():
     return jsonify({"error": "Invalid credentials"}), 401
 
 
-# ---------------------------
+
 # ПОЛУЧИТЬ ЗАДАЧИ
-# ---------------------------
+
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
     token = request.headers.get("Authorization")  # берём токен
@@ -112,9 +112,9 @@ def get_tasks():
     return jsonify(tasks)
 
 
-# ---------------------------
+
 # СОЗДАТЬ ЗАДАЧУ
-# ---------------------------
+
 @app.route("/tasks", methods=["POST"])
 def create_task():
     token = request.headers.get("Authorization")
