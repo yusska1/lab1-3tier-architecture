@@ -7,18 +7,27 @@ import uuid
 app = Flask(__name__)
 Swagger(app)
 
-# подключение к БД
+# ===== DB =====
 def get_db():
     return sqlite3.connect("database.db")
 
-
+# ===== PASSWORD HASH =====
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
+# ===== TOKENS =====
 tokens = {}
 
+# ===== INIT DB =====
 @app.route("/init")
 def init_db():
+    """
+    Initialize database
+    ---
+    responses:
+      200:
+        description: database created
+    """
     db = get_db()
     cur = db.cursor()
 
@@ -55,9 +64,30 @@ def init_db():
     db.commit()
     return "DB initialized"
 
-# логин
+# ===== LOGIN =====
 @app.route("/login", methods=["POST"])
 def login():
+    """
+    User login
+    ---
+    parameters:
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            username:
+              type: string
+            password:
+              type: string
+    responses:
+      200:
+        description: success
+      401:
+        description: invalid credentials
+    """
+
     data = request.json
 
     db = get_db()
@@ -77,12 +107,28 @@ def login():
 
     return jsonify({"error": "Invalid credentials"}), 401
 
+# ===== GET USER =====
 def get_user(token):
     return tokens.get(token)
 
-# получение задач
+# ===== GET TASKS =====
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
+    """
+    Get tasks
+    ---
+    parameters:
+      - name: Authorization
+        in: header
+        required: true
+        type: string
+    responses:
+      200:
+        description: list of tasks
+      401:
+        description: unauthorized
+    """
+
     token = request.headers.get("Authorization")
     user = get_user(token)
 
@@ -99,9 +145,34 @@ def get_tasks():
 
     return jsonify(cur.fetchall())
 
-# создание задачи
+# ===== CREATE TASK =====
 @app.route("/tasks", methods=["POST"])
 def create_task():
+    """
+    Create task
+    ---
+    parameters:
+      - name: Authorization
+        in: header
+        required: true
+        type: string
+      - name: body
+        in: body
+        required: true
+        schema:
+          type: object
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+    responses:
+      200:
+        description: task created
+      403:
+        description: forbidden
+    """
+
     token = request.headers.get("Authorization")
     user = get_user(token)
 
@@ -125,6 +196,6 @@ def create_task():
 
     return jsonify({"status": "created"})
 
-# запуск сервера
+# ===== RUN SERVER =====
 if __name__ == "__main__":
     app.run(debug=True)
