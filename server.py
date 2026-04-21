@@ -7,18 +7,15 @@ import uuid
 app = Flask(__name__)
 Swagger(app)
 
-# ===== DB =====
 def get_db():
     return sqlite3.connect("database.db")
 
-# ===== PASSWORD HASH =====
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
-# ===== TOKENS =====
 tokens = {}
 
-# ===== INIT DB =====
+# инициализация базы д.
 @app.route("/init")
 def init_db():
     """
@@ -64,7 +61,7 @@ def init_db():
     db.commit()
     return "DB initialized"
 
-# ===== LOGIN =====
+# логин
 @app.route("/login", methods=["POST"])
 def login():
     """
@@ -107,11 +104,11 @@ def login():
 
     return jsonify({"error": "Invalid credentials"}), 401
 
-# ===== GET USER =====
+# получ. пользователя 
 def get_user(token):
     return tokens.get(token)
 
-# ===== GET TASKS =====
+# получ. задач
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
     """
@@ -145,7 +142,7 @@ def get_tasks():
 
     return jsonify(cur.fetchall())
 
-# ===== CREATE TASK =====
+# созд. задач
 @app.route("/tasks", methods=["POST"])
 def create_task():
     """
@@ -196,6 +193,6 @@ def create_task():
 
     return jsonify({"status": "created"})
 
-# ===== RUN SERVER =====
+# запуск сервера 
 if __name__ == "__main__":
     app.run(debug=True)
