@@ -1,26 +1,28 @@
-import requests  # библиотека для отправки HTTP-запросов
+import requests
 
 BASE_URL = "http://127.0.0.1:5000"
 
-
-# логин пользователя
+# логин
 def login():
-    username = input("Username: ").strip()
-    password = input("Password: ").strip()
+    username = input("Username: ")
+    password = input("Password: ")
 
-    # отправляем POST запрос на сервер
     r = requests.post(BASE_URL + "/login", json={
         "username": username,
         "password": password
     })
 
-    data = r.json()
-    print(data)
+    return r.json()
 
-    return data
+# получение задач
+def get_tasks(token):
+    r = requests.get(
+        BASE_URL + "/tasks",
+        headers={"Authorization": token}
+    )
+    print(r.json())
 
-
-# создаем задачи
+# создание задачи
 def create_task(token):
     title = input("Title: ")
     desc = input("Description: ")
@@ -28,45 +30,30 @@ def create_task(token):
     r = requests.post(
         BASE_URL + "/tasks",
         json={"title": title, "description": desc},
-        headers={"Authorization": str(token)}  # передаём токен
+        headers={"Authorization": token}
     )
 
     print(r.json())
 
-
-# получение задач
-def get_tasks(token):
-    r = requests.get(
-        BASE_URL + "/tasks",
-        headers={"Authorization": str(token)}
-    )
-
-    print(r.json())
-
-
-# основная логика программы
+# запуск клиента
 data = login()
 
-# если логин не удался то...
 if "token" not in data:
-    print("Login failed!")
+    print("Login failed")
     exit()
 
 token = data["token"]
 
-# меню
 while True:
-    print("\n1. Create task")
-    print("2. Get tasks")
+    print("\n1. Get tasks")
+    print("2. Create task")
     print("3. Exit")
 
-    choice = input("> ")
+    c = input("> ")
 
-    if choice == "1":
-        create_task(token)
-    elif choice == "2":
+    if c == "1":
         get_tasks(token)
-    elif choice == "3":
+    elif c == "2":
+        create_task(token)
+    elif c == "3":
         break
-    else:
-        print("Invalid choice")
